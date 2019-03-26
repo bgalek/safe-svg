@@ -5,6 +5,7 @@
 ![Codecov](https://img.shields.io/codecov/c/github/bgalek/safe-svg.svg?style=flat-square)
 ![GitHub Release Date](https://img.shields.io/github/release-date/bgalek/safe-svg.svg?style=flat-square)
 ![Libraries.io dependency status for GitHub repo](https://img.shields.io/librariesio/github/bgalek/safe-svg.svg?style=flat-square)
+![Scrutinizer code quality](https://img.shields.io/scrutinizer/g/bgalek/safe-svg.svg?style=flat-square)
 
 It will help you in detecting malicious content inside uploaded SVGs.
 
