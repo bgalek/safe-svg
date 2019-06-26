@@ -1,18 +1,22 @@
 plugins {
-    id("pl.allegro.tech.build.axion-release") version "1.10.0"
     `java-library`
     `maven-publish`
     signing
     jacoco
+    id("pl.allegro.tech.build.axion-release") version "1.10.0"
+    id("com.gradle.build-scan") version "2.1"
+    id("com.adarshr.test-logger") version "1.6.0"
+    id("org.sonarqube") version "2.7"
 }
 
 repositories {
+    jcenter()
     mavenCentral()
 }
 
 dependencies {
-    implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20181114.1")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.4.0")
+    implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20190610.1")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.4.2")
 }
 
 group = "com.github.bgalek.security.svg"
@@ -119,4 +123,9 @@ tasks.javadoc {
     if (JavaVersion.current().isJava9Compatible) {
         (options as StandardJavadocDocletOptions).addBooleanOption("html5", true)
     }
+}
+
+buildScan {
+    termsOfServiceUrl = "https://gradle.com/terms-of-service"
+    termsOfServiceAgree = "yes"
 }
