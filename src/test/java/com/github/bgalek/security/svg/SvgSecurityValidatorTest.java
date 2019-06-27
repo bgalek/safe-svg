@@ -18,7 +18,7 @@ class SvgSecurityValidatorTest {
     @ValueSource(strings = {"hacked/with-onclick-attribute.svg", "hacked/with-script-tag.svg"})
     void shouldDetectXssInFiles(String file) {
         ValidationResult detect = new SvgSecurityValidator().validate(loadFile(file));
-        assertEquals(detect.getOffendingElements().size(), 1);
+        assertEquals(1, detect.getOffendingElements().size());
         assertTrue(detect.hasViolations());
     }
 
@@ -26,7 +26,7 @@ class SvgSecurityValidatorTest {
     @ValueSource(strings = {"original/valid.svg"})
     void shouldNotDetectAnythingInValidFiles(String file) {
         ValidationResult detect = new SvgSecurityValidator().validate(loadFile(file));
-        assertEquals(detect.getOffendingElements().size(), 0);
+        assertEquals(0, detect.getOffendingElements().size());
         assertFalse(detect.hasViolations());
     }
 
@@ -34,7 +34,7 @@ class SvgSecurityValidatorTest {
     @ValueSource(strings = {"original/valid.svg"})
     void shouldNotDetectAnythingInValidFilesUsingBytes(String file) {
         ValidationResult detect = new SvgSecurityValidator().validate(loadFile(file).getBytes());
-        assertEquals(detect.getOffendingElements().size(), 0);
+        assertEquals(0, detect.getOffendingElements().size());
         assertFalse(detect.hasViolations());
     }
 
@@ -42,7 +42,7 @@ class SvgSecurityValidatorTest {
     @ValueSource(strings = {"broken/broken.csv.svg"})
     void shouldThrowExceptionWhenInputIsNotValidXml(String file) {
         ValidationResult detect = new SvgSecurityValidator().validate(loadFile(file));
-        assertEquals(detect.getOffendingElements().size(), 0);
+        assertEquals(0, detect.getOffendingElements().size());
         assertFalse(detect.hasViolations());
     }
 
@@ -50,7 +50,7 @@ class SvgSecurityValidatorTest {
     @ValueSource(strings = {"broken/broken.png.svg"})
     void shouldThrowExceptionWhenInputIsBinaryType(String file) {
         ValidationResult detect = new SvgSecurityValidator().validate(loadFile(file).getBytes());
-        assertEquals(detect.getOffendingElements().size(), 0);
+        assertEquals(0, detect.getOffendingElements().size());
         assertFalse(detect.hasViolations());
     }
 
