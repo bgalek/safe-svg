@@ -4,9 +4,8 @@ plugins {
     signing
     jacoco
     id("pl.allegro.tech.build.axion-release") version "1.10.0"
-    id("com.gradle.build-scan") version "2.1"
     id("com.adarshr.test-logger") version "1.6.0"
-    id("org.sonarqube") version "2.7"
+    id("org.sonarqube") version "2.8"
 }
 
 repositories {
@@ -48,7 +47,7 @@ tasks.register<Jar>("javadocJar") {
 }
 
 jacoco {
-    toolVersion = "0.8.2"
+    toolVersion = "0.8.5"
     reportsDir = file("$buildDir/reports/jacoco")
 }
 
