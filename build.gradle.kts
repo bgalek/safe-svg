@@ -21,6 +21,11 @@ dependencies {
 group = "com.github.bgalek.security.svg"
 version = scmVersion.version
 
+configure<JavaPluginConvention> {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
 tasks {
     jar {
         manifest {
