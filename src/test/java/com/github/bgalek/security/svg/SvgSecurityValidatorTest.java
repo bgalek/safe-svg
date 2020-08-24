@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class SvgSecurityValidatorTest {
 
     @ParameterizedTest(name = "validate {0} svg")
-    @ValueSource(strings = {"hacked/with-onclick-attribute.svg", "hacked/with-script-tag.svg"})
+    @ValueSource(strings = {"hacked/with-onclick-attribute.svg", "hacked/with-script-tag.svg", "hacked/with-script-tag-in-styles.svg"})
     void shouldDetectXssInFiles(String file) {
         ValidationResult detect = new SvgSecurityValidator().validate(loadFile(file));
         assertEquals(1, detect.getOffendingElements().size());
