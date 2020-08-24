@@ -3,7 +3,7 @@ plugins {
     `maven-publish`
     signing
     jacoco
-    id("pl.allegro.tech.build.axion-release") version "1.10.0"
+    id("pl.allegro.tech.build.axion-release") version "1.12.0"
     id("com.adarshr.test-logger") version "1.6.0"
     id("org.sonarqube") version "2.8"
 }
@@ -15,7 +15,7 @@ repositories {
 
 dependencies {
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20190610.1")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.4.2")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.6.2")
 }
 
 group = "com.github.bgalek.security.svg"

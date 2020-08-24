@@ -89,6 +89,7 @@ public class SvgSecurityValidator implements XssDetector {
             "radialgradient",
             "rect",
             "stop",
+            "style",
             "switch",
             "symbol",
             "text",
