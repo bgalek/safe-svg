@@ -6,9 +6,11 @@ import org.owasp.html.PolicyFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * SVG Safe is a very simple and lightweight library that helps
@@ -19,6 +21,8 @@ import java.util.Set;
  * @see <a href="https://github.com/bgalek/safe-svg">safe-svg</a>
  */
 public class SvgSecurityValidator implements XssDetector {
+
+    private static final Pattern JAVASCRIPT_PROTOCOL_IN_CSS_URL = Pattern.compile("url\\(.?javascript");
 
     /**
      * This is the main method that handles svg file validation
@@ -40,6 +44,7 @@ public class SvgSecurityValidator implements XssDetector {
     }
 
     private static Set<String> getOffendingElements(String xml) {
+        if (JAVASCRIPT_PROTOCOL_IN_CSS_URL.matcher(xml).find()) return Collections.singleton("style");
         PolicyFactory policy = new HtmlPolicyBuilder()
                 .allowElements(SVG_ELEMENTS)
                 .allowStyling()
@@ -303,7 +308,10 @@ public class SvgSecurityValidator implements XssDetector {
             "x",
             "x1",
             "x2",
+            "xlink:href",
             "xmlns",
+            "xml:space",
+            "xmlns:xlink",
             "y",
             "y1",
             "y2",
