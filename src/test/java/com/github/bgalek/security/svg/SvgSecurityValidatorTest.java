@@ -18,44 +18,44 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SvgSecurityValidatorTest {
 
-    @ParameterizedTest(name = "validate {0} svg")
     @MethodSource("evilUseCases")
+    @ParameterizedTest(name = "validate {0} svg")
     void shouldDetectXssInFiles(String file, String expectedOffendingElements) {
         ValidationResult detect = new SvgSecurityValidator().validate(loadFile(file));
-        assertTrue(detect.hasViolations());
         assertEquals(expectedOffendingElements, String.join(",", detect.getOffendingElements()));
+        assertTrue(detect.hasViolations());
     }
 
+    @MethodSource("safeUseCases")
     @ParameterizedTest(name = "validate {0} svg")
-    @ValueSource(strings = {"original/valid.svg"})
     void shouldNotDetectAnythingInValidFiles(String file) {
         ValidationResult detect = new SvgSecurityValidator().validate(loadFile(file));
-        assertFalse(detect.hasViolations());
         assertEquals(Collections.emptySet(), detect.getOffendingElements());
+        assertFalse(detect.hasViolations());
     }
 
+    @MethodSource("safeUseCases")
     @ParameterizedTest(name = "validate {0} svg")
-    @ValueSource(strings = {"original/valid.svg"})
     void shouldNotDetectAnythingInValidFilesUsingBytes(String file) {
         ValidationResult detect = new SvgSecurityValidator().validate(loadFile(file).getBytes());
-        assertFalse(detect.hasViolations());
         assertEquals(Collections.emptySet(), detect.getOffendingElements());
+        assertFalse(detect.hasViolations());
     }
 
+    @MethodSource("brokenUseCases")
     @ParameterizedTest(name = "validate {0} svg")
-    @ValueSource(strings = {"broken/broken.csv.svg"})
     void shouldThrowExceptionWhenInputIsNotValidXml(String file) {
         ValidationResult detect = new SvgSecurityValidator().validate(loadFile(file));
-        assertFalse(detect.hasViolations());
         assertEquals(Collections.emptySet(), detect.getOffendingElements());
+        assertFalse(detect.hasViolations());
     }
 
-    @ParameterizedTest(name = "validate {0} svg")
-    @ValueSource(strings = {"broken/broken.png.svg"})
-    void shouldThrowExceptionWhenInputIsBinaryType(String file) {
-        ValidationResult detect = new SvgSecurityValidator().validate(loadFile(file).getBytes());
-        assertFalse(detect.hasViolations());
-        assertEquals(Collections.emptySet(), detect.getOffendingElements());
+    private static Stream<Arguments> safeUseCases() {
+        return Stream.of(
+                Arguments.of("safe/valid1.svg"),
+                Arguments.of("safe/valid2.svg"),
+                Arguments.of("safe/valid3.svg")
+        );
     }
 
     private static Stream<Arguments> evilUseCases() {
@@ -65,6 +65,13 @@ class SvgSecurityValidatorTest {
                 Arguments.of("hacked/with-script-tag-in-styles.svg", "script"),
                 Arguments.of("hacked/with-css-url-syntax.svg", "style"),
                 Arguments.of("hacked/with-xlink-injection.svg", "script")
+        );
+    }
+
+    private static Stream<Arguments> brokenUseCases() {
+        return Stream.of(
+                Arguments.of("broken/broken.csv.svg"),
+                Arguments.of("broken/broken.png.svg")
         );
     }
 

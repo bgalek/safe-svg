@@ -33,7 +33,7 @@ alert('Hello, world!');
 
 Add library dependency:
 ```groovy
-compile "com.github.bgalek.security.svg:safe-svg:1.1.0"
+compile "com.github.bgalek.security.svg:safe-svg:1.1.1"
 ```
 
 You can use this library to check uploaded svg files
