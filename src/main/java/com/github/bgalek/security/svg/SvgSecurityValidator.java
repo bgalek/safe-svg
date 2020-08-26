@@ -1,5 +1,8 @@
 package com.github.bgalek.security.svg;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import org.owasp.html.CssSchema;
 import org.owasp.html.HtmlChangeListener;
 import org.owasp.html.HtmlPolicyBuilder;
 import org.owasp.html.PolicyFactory;
@@ -47,7 +50,7 @@ public class SvgSecurityValidator implements XssDetector {
         if (JAVASCRIPT_PROTOCOL_IN_CSS_URL.matcher(xml).find()) return Collections.singleton("style");
         PolicyFactory policy = new HtmlPolicyBuilder()
                 .allowElements(SVG_ELEMENTS)
-                .allowStyling()
+                .allowStyling(CssSchema.withProperties(SVG_SPECIFIC_STYLES))
                 .allowAttributes(SVG_ATTRIBUTES).globally()
                 .allowUrlProtocols("https")
                 .toFactory();
@@ -55,6 +58,10 @@ public class SvgSecurityValidator implements XssDetector {
         policy.sanitize(xml, violationsCollector(), violations);
         return violations;
     }
+
+    private static final ImmutableMap<String, CssSchema.Property> SVG_SPECIFIC_STYLES = ImmutableMap.of(
+            "enable-background", new CssSchema.Property(1, ImmutableSet.of(), ImmutableMap.of())
+    );
 
     /**
      * @see <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Element">
