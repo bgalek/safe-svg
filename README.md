@@ -16,7 +16,7 @@ Read [https://sekurak.pl/pozwalasz-ladowac-pliki-svg-masz-xss-a/](https://sekura
 
 ## Example
 
-Try to upload this SVG into your application, if it passes through and user can browse this file - probably You are venerable to XSS attack.  
+Try to upload this SVG into your application, if it passes through and user can browse this file - probably You are vulnerable to XSS attack.  
 
 ```xml
 <?xml version="1.0" standalone="no"?>
