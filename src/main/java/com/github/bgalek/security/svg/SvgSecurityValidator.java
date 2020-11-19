@@ -50,7 +50,7 @@ public class SvgSecurityValidator implements XssDetector {
         if (JAVASCRIPT_PROTOCOL_IN_CSS_URL.matcher(xml).find()) return Collections.singleton("style");
         PolicyFactory policy = new HtmlPolicyBuilder()
                 .allowElements(SVG_ELEMENTS)
-                .allowStyling(CssSchema.withProperties(SVG_SPECIFIC_STYLES))
+                .allowStyling(CssSchema.union(CssSchema.DEFAULT, CssSchema.withProperties(SVG_SPECIFIC_STYLES)))
                 .allowAttributes(SVG_ATTRIBUTES).globally()
                 .allowUrlProtocols("https")
                 .toFactory();
