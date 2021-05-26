@@ -1,7 +1,7 @@
 # SVG SECURITY
 > Simple and lightweight library that helps to validate SVG files in security manners. 
 
-![Travis (.org)](https://img.shields.io/travis/bgalek/safe-svg.svg?style=flat-square) 
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/bgalek/safe-svg/Build?style=flat-square)
 ![Codecov](https://img.shields.io/codecov/c/github/bgalek/safe-svg.svg?style=flat-square)
 ![GitHub Release Date](https://img.shields.io/github/release-date/bgalek/safe-svg.svg?style=flat-square)
 ![Libraries.io dependency status for GitHub repo](https://img.shields.io/librariesio/github/bgalek/safe-svg.svg?style=flat-square)
