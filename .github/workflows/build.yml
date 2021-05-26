@@ -41,7 +41,7 @@ jobs:
         uses: codecov/codecov-action@v1
         
       - name: Sonarcube scan
-        run: ./gradlew sonarqube -Dsonar.login=${SONAR_TOKEN} -Dsonar.projectKey=bgalek_safe-svg -Dsonar.organization=bgalek-github -Dsonar.host.url=https://sonarcloud.io"
+        run: ./gradlew sonarqube -Dsonar.login=${SONAR_TOKEN} -Dsonar.projectKey=bgalek_safe-svg -Dsonar.organization=bgalek-github -Dsonar.host.url=https://sonarcloud.io
         env:  
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           
