@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20190610.1")
+    implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20211018.2")
     testImplementation("org.junit.jupiter:junit-jupiter:5.6.2")
 }
 
