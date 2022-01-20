@@ -6,10 +6,10 @@ plugins {
     id("org.sonarqube") version "3.2.0"
     id("pl.allegro.tech.build.axion-release") version "1.13.2"
     id("com.adarshr.test-logger") version "3.0.0"
+    id("io.github.gradle-nexus.publish-plugin") version "1.0.0"
 }
 
 repositories {
-    jcenter()
     mavenCentral()
 }
 
@@ -21,9 +21,12 @@ dependencies {
 group = "com.github.bgalek.security.svg"
 version = scmVersion.version
 
-configure<JavaPluginConvention> {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+java {
+    withSourcesJar()
+    withJavadocJar()
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(8))
+    }
 }
 
 tasks {
@@ -39,16 +42,6 @@ tasks.withType<Test> {
     testLogging {
         events("passed", "skipped", "failed")
     }
-}
-
-tasks.register<Jar>("sourcesJar") {
-    from(sourceSets.main.get().allJava)
-    archiveClassifier.set("sources")
-}
-
-tasks.register<Jar>("javadocJar") {
-    from(tasks.javadoc)
-    archiveClassifier.set("javadoc")
 }
 
 jacoco {
@@ -70,8 +63,6 @@ publishing {
         create<MavenPublication>("sonatype") {
             artifactId = "safe-svg"
             from(components["java"])
-            artifact(tasks["sourcesJar"])
-            artifact(tasks["javadocJar"])
             versionMapping {
                 usage("java-api") {
                     fromResolutionOf("runtimeClasspath")
@@ -107,10 +98,6 @@ publishing {
     }
     repositories {
         maven {
-            credentials {
-                username = project.properties.get("ossrhUsername") as String?
-                password = project.properties.get("ossrhPassword") as String?
-            }
             val releasesRepoUrl = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
             val snapshotsRepoUrl = uri("https://oss.sonatype.org/content/repositories/snapshots/")
             url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
@@ -118,18 +105,22 @@ publishing {
     }
 }
 
-signing {
-    useGpgCmd()
-    sign(publishing.publications["sonatype"])
-}
-
-tasks.javadoc {
-    if (JavaVersion.current().isJava9Compatible) {
-        (options as StandardJavadocDocletOptions).addBooleanOption("html5", true)
+nexusPublishing {
+    repositories {
+        sonatype {
+            username.set(System.getenv("SONATYPE_USERNAME"))
+            password.set(System.getenv("SONATYPE_PASSWORD"))
+        }
     }
 }
 
-buildScan {
-    termsOfServiceUrl = "https://gradle.com/terms-of-service"
-    termsOfServiceAgree = "yes"
+System.getenv("GPG_KEY_ID")?.let {
+    signing {
+        useInMemoryPgpKeys(
+            System.getenv("GPG_KEY_ID"),
+            System.getenv("GPG_PRIVATE_KEY"),
+            System.getenv("GPG_PRIVATE_KEY_PASSWORD")
+        )
+        sign(publishing.publications)
+    }
 }
