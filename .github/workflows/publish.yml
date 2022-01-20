@@ -19,7 +19,7 @@ jobs:
         with:
           java-version: 1.8
       - name: Publish to maven central
-        run: ./gradlew closeAndReleaseSonatypeStagingRepository
+        run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
         env:  
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
