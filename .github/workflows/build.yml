@@ -1,12 +1,11 @@
 name: Build
-
 on: [push, pull_request]
-
+permissions:
+  contents: write
+  pull-requests: write
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
       - uses: gradle/wrapper-validation-action@v1
@@ -28,16 +27,28 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Test with Gradle
         run: ./gradlew --no-daemon --continue check
-        
       - name: Jacoco
         run: ./gradlew jacocoTestReport
-     
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
-        
       - name: Analyze with SonarCloud
         if: github.ref == 'refs/heads/main'
         run: ./gradlew sonarqube -Dsonar.login=${SONAR_TOKEN} -Dsonar.projectKey=bgalek_safe-svg -Dsonar.organization=bgalek-github -Dsonar.host.url=https://sonarcloud.io
         env:  
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  dependabot:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' && github.actor == 'dependabot[bot]' }}
+    needs: build
+    steps:
+      - name: Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v1.1.1
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+      - name: Enable auto-merge for Dependabot PRs
+        run: gh pr merge --auto --merge "$PR_URL"
+        env:
+          PR_URL: ${{github.event.pull_request.html_url}}
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
