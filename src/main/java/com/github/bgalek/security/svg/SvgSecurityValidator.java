@@ -31,7 +31,7 @@ public class SvgSecurityValidator implements XssDetector {
     private final String[] svgAttributes;
 
     /**
-     * @see SvgSecurityValidator.Builder()
+     * Use builder SvgSecurityValidator.builder()
      */
     @Deprecated
     public SvgSecurityValidator() {
