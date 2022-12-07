@@ -1,15 +1,14 @@
 package com.github.bgalek.security.svg;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.Collections;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -49,6 +48,25 @@ class SvgSecurityValidatorTest {
         assertEquals(Collections.emptySet(), detect.getOffendingElements());
         assertFalse(detect.hasViolations());
     }
+
+    @Test
+    void shouldNotFailWhenUserDefinedAttributesFound() {
+        String testFile = loadFile("custom/custom1.svg");
+        List<String> strings = Collections.singletonList("horiz-adv-x");
+        ValidationResult detect = new SvgSecurityValidator(Collections.emptyList(), strings).validate(testFile);
+        assertEquals(Collections.emptySet(), detect.getOffendingElements());
+        assertFalse(detect.hasViolations());
+    }
+
+    @Test
+    void shouldNotFailWhenUserDefinedElementsFound() {
+        String testFile = loadFile("custom/custom2.svg");
+        List<String> strings = Collections.singletonList("cursor");
+        ValidationResult detect = new SvgSecurityValidator(strings, Collections.emptyList()).validate(testFile);
+        assertEquals(Collections.emptySet(), detect.getOffendingElements());
+        assertFalse(detect.hasViolations());
+    }
+
 
     private static Stream<Arguments> safeUseCases() {
         return Stream.of(
