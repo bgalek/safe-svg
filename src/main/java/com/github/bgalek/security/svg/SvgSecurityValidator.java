@@ -11,9 +11,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 /**
  * SVG Safe is a very simple and lightweight library that helps
@@ -26,6 +28,23 @@ import java.util.regex.Pattern;
 public class SvgSecurityValidator implements XssDetector {
 
     private static final Pattern JAVASCRIPT_PROTOCOL_IN_CSS_URL = Pattern.compile("url\\(.?javascript");
+
+    private final String[] svgElements;
+    private final String[] svgAttributes;
+
+    private SvgSecurityValidator(String[] elements, String[] attributes) {
+        this.svgElements = elements;
+        this.svgAttributes = attributes;
+    }
+
+    public SvgSecurityValidator() {
+        this(SVG_ELEMENTS, SVG_ATTRIBUTES);
+    }
+
+    public SvgSecurityValidator(List<String> additionalElements, List<String> additionalAttributes) {
+        this.svgElements = Stream.concat(Arrays.stream(SVG_ELEMENTS), additionalElements.stream()).distinct().toArray(String[]::new);
+        this.svgAttributes = Stream.concat(Arrays.stream(SVG_ATTRIBUTES), additionalAttributes.stream()).distinct().toArray(String[]::new);
+    }
 
     /**
      * This is the main method that handles svg file validation
@@ -46,12 +65,12 @@ public class SvgSecurityValidator implements XssDetector {
         return validate(new String(input, StandardCharsets.UTF_8));
     }
 
-    private static Set<String> getOffendingElements(String xml) {
+    private Set<String> getOffendingElements(String xml) {
         if (JAVASCRIPT_PROTOCOL_IN_CSS_URL.matcher(xml).find()) return Collections.singleton("style");
         PolicyFactory policy = new HtmlPolicyBuilder()
-                .allowElements(SVG_ELEMENTS)
+                .allowElements(this.svgElements)
                 .allowStyling(CssSchema.union(CssSchema.DEFAULT, CssSchema.withProperties(SVG_SPECIFIC_STYLES)))
-                .allowAttributes(SVG_ATTRIBUTES).globally()
+                .allowAttributes(this.svgAttributes).globally()
                 .allowUrlProtocols("https")
                 .toFactory();
         Set<String> violations = new HashSet<>();

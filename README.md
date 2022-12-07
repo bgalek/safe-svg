@@ -53,3 +53,8 @@ String svg = "<?xml version=\"1.0\" standalone=\"no\"?>\n" +
             throw new RuntimeException("this file is suspicious" + validation.getOffendingElements());
         }
 ```
+
+If you want to allow other (possibly non-safe) elements/attributes use
+```java
+ValidationResult detect = new SvgSecurityValidator(CUSTOM_ELEMENTS, CUSTOM_ATTRIBUTES).validate(testFile)
+```
