@@ -42,6 +42,7 @@ compile "com.github.bgalek.security.svg:safe-svg:1.1.4"
 You can use this library to check uploaded svg files
 
 ```java
+SvgSecurityValidator svgSecurityValidator = SvgSecurityValidator.builder().build();
 String svg = "<?xml version=\"1.0\" standalone=\"no\"?>\n" +
                 "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n" +
                 "<svg version=\"1.1\" baseProfile=\"full\" xmlns=\"http://www.w3.org/2000/svg\">\n" +
