@@ -1,5 +1,7 @@
-package com.github.bgalek.security.svg;
+package com.github.bgalek.security;
 
+import com.github.bgalek.security.svg.SvgSecurityValidator;
+import com.github.bgalek.security.svg.ValidationResult;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -8,7 +10,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -20,7 +24,7 @@ class SvgSecurityValidatorTest {
     @MethodSource("evilUseCases")
     @ParameterizedTest(name = "validate {0} svg")
     void shouldDetectXssInFiles(String file, String expectedOffendingElements) {
-        ValidationResult detect = new SvgSecurityValidator().validate(loadFile(file));
+        ValidationResult detect = SvgSecurityValidator.builder().build().validate(loadFile(file));
         assertEquals(expectedOffendingElements, String.join(",", detect.getOffendingElements()));
         assertTrue(detect.hasViolations());
     }
@@ -28,7 +32,7 @@ class SvgSecurityValidatorTest {
     @MethodSource("safeUseCases")
     @ParameterizedTest(name = "validate {0} svg")
     void shouldNotDetectAnythingInValidFiles(String file) {
-        ValidationResult detect = new SvgSecurityValidator().validate(loadFile(file));
+        ValidationResult detect = SvgSecurityValidator.builder().build().validate(loadFile(file));
         assertEquals(Collections.emptySet(), detect.getOffendingElements());
         assertFalse(detect.hasViolations());
     }
@@ -36,7 +40,7 @@ class SvgSecurityValidatorTest {
     @MethodSource("safeUseCases")
     @ParameterizedTest(name = "validate {0} svg")
     void shouldNotDetectAnythingInValidFilesUsingBytes(String file) {
-        ValidationResult detect = new SvgSecurityValidator().validate(loadFile(file).getBytes());
+        ValidationResult detect = SvgSecurityValidator.builder().build().validate(loadFile(file).getBytes());
         assertEquals(Collections.emptySet(), detect.getOffendingElements());
         assertFalse(detect.hasViolations());
     }
@@ -44,27 +48,41 @@ class SvgSecurityValidatorTest {
     @MethodSource("brokenUseCases")
     @ParameterizedTest(name = "validate {0} svg")
     void shouldThrowExceptionWhenInputIsNotValidXml(String file) {
-        ValidationResult detect = new SvgSecurityValidator().validate(loadFile(file));
+        ValidationResult detect = SvgSecurityValidator.builder().build().validate(loadFile(file));
         assertEquals(Collections.emptySet(), detect.getOffendingElements());
         assertFalse(detect.hasViolations());
     }
 
     @Test
-    void shouldNotFailWhenUserDefinedAttributesFound() {
+    void shouldNotFailWhenUserDefinedAttributesAreUsed() {
         String testFile = loadFile("custom/custom1.svg");
         List<String> strings = Collections.singletonList("horiz-adv-x");
-        ValidationResult detect = new SvgSecurityValidator(Collections.emptyList(), strings).validate(testFile);
+        ValidationResult detect = SvgSecurityValidator.builder()
+                .withAdditionalAttributes(strings)
+                .build()
+                .validate(testFile);
         assertEquals(Collections.emptySet(), detect.getOffendingElements());
         assertFalse(detect.hasViolations());
     }
 
     @Test
-    void shouldNotFailWhenUserDefinedElementsFound() {
+    void shouldNotFailWhenUserDefinedElementsAreUsed() {
         String testFile = loadFile("custom/custom2.svg");
         List<String> strings = Collections.singletonList("cursor");
-        ValidationResult detect = new SvgSecurityValidator(strings, Collections.emptyList()).validate(testFile);
+        ValidationResult detect = SvgSecurityValidator.builder()
+                .withAdditionalElements(strings)
+                .build()
+                .validate(testFile);
         assertEquals(Collections.emptySet(), detect.getOffendingElements());
         assertFalse(detect.hasViolations());
+    }
+
+    @MethodSource("evilUseCases")
+    @ParameterizedTest(name = "validate {0} svg")
+    void shouldDetectXssInFilesUsingDeprecatedApi(String file, String expectedOffendingElements) {
+        ValidationResult detect = new SvgSecurityValidator().validate(loadFile(file));
+        assertEquals(expectedOffendingElements, String.join(",", detect.getOffendingElements()));
+        assertTrue(detect.hasViolations());
     }
 
 

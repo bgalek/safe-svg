@@ -1,5 +1,6 @@
 # SVG SECURITY
-> Simple and lightweight library that helps to validate SVG files in security manners. 
+
+> Simple and lightweight library that helps to validate SVG files in security manners.
 
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/bgalek/safe-svg/Build?style=flat-square)
 ![Codecov](https://img.shields.io/codecov/c/github/bgalek/safe-svg.svg?style=flat-square)
@@ -17,7 +18,7 @@ Read [https://sekurak.pl/pozwalasz-ladowac-pliki-svg-masz-xss-a/](https://sekura
 
 ## Example
 
-Try to upload this SVG into your application, if it passes through and user can browse this file - probably You are vulnerable to XSS attack.  
+Try to upload this SVG into your application, if it passes through and user can browse this file - probably You are vulnerable to XSS attack.
 
 ```xml
 <?xml version="1.0" standalone="no"?>
@@ -33,6 +34,7 @@ alert('Hello, world!');
 ## Usage
 
 Add library dependency:
+
 ```groovy
 compile "com.github.bgalek.security.svg:safe-svg:1.1.4"
 ```
@@ -55,6 +57,11 @@ String svg = "<?xml version=\"1.0\" standalone=\"no\"?>\n" +
 ```
 
 If you want to allow other (possibly non-safe) elements/attributes use
+
 ```java
-ValidationResult detect = new SvgSecurityValidator(CUSTOM_ELEMENTS, CUSTOM_ATTRIBUTES).validate(testFile)
+ValidationResult detect = SvgSecurityValidator.builder()
+    .withAdditionalElements(elements)
+    .withAdditionalAttributes(attributes)
+    .build()
+    .validate(testFile);
 ```
