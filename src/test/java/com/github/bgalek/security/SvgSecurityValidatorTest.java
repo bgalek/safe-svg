@@ -10,6 +10,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -67,6 +69,18 @@ class SvgSecurityValidatorTest {
 
     @Test
     void shouldNotFailWhenUserDefinedElementsAreUsed() {
+        String testFile = loadFile("custom/custom3.svg");
+        ValidationResult detect = SvgSecurityValidator.builder()
+                .withAdditionalElements(Arrays.asList("horiz-adv-x", "missing-glyph", "font-face", "font"))
+                .withAdditionalAttributes(Arrays.asList("horiz-adv-x", "font", "units-per-em"))
+                .build()
+                .validate(testFile);
+        assertEquals(Collections.emptySet(), detect.getOffendingElements());
+        assertFalse(detect.hasViolations());
+    }
+
+    @Test
+    void shouldNotFailWhenCustomStylesAreUsed() {
         String testFile = loadFile("custom/custom2.svg");
         List<String> strings = Collections.singletonList("cursor");
         ValidationResult detect = SvgSecurityValidator.builder()

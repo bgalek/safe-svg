@@ -71,7 +71,6 @@ public class SvgSecurityValidator implements XssDetector {
         if (JAVASCRIPT_PROTOCOL_IN_CSS_URL.matcher(xml).find()) return Collections.singleton("style");
         PolicyFactory policy = new HtmlPolicyBuilder()
                 .allowElements(this.svgElements)
-                .allowStyling(CssSchema.union(CssSchema.DEFAULT, CssSchema.withProperties(SVG_SPECIFIC_STYLES)))
                 .allowAttributes(this.svgAttributes).globally()
                 .allowUrlProtocols("https")
                 .toFactory();
@@ -79,10 +78,6 @@ public class SvgSecurityValidator implements XssDetector {
         policy.sanitize(xml, violationsCollector(), violations);
         return violations;
     }
-
-    private static final ImmutableMap<String, CssSchema.Property> SVG_SPECIFIC_STYLES = ImmutableMap.of(
-            "enable-background", new CssSchema.Property(1, ImmutableSet.of(), ImmutableMap.of())
-    );
 
     private static HtmlChangeListener<Set<String>> violationsCollector() {
         return new ListHtmlChangeListener();
