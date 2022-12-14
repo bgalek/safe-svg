@@ -1,7 +1,9 @@
 package com.github.bgalek.security;
 
+import com.github.bgalek.security.svg.InvalidXMLSyntaxException;
 import com.github.bgalek.security.svg.SvgSecurityValidator;
 import com.github.bgalek.security.svg.ValidationResult;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -10,7 +12,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -49,10 +50,22 @@ class SvgSecurityValidatorTest {
 
     @MethodSource("brokenUseCases")
     @ParameterizedTest(name = "validate {0} svg")
-    void shouldThrowExceptionWhenInputIsNotValidXml(String file) {
+    void shouldNotThrowExceptionWhenInputIsNotValidXml(String file) {
         ValidationResult detect = SvgSecurityValidator.builder().build().validate(loadFile(file));
         assertEquals(Collections.emptySet(), detect.getOffendingElements());
         assertFalse(detect.hasViolations());
+    }
+
+    @MethodSource("brokenUseCases")
+    @ParameterizedTest(name = "validate {0} svg")
+    void shouldThrowExceptionWhenInputIsNotValidXmlAndSyntaxValidationIsEnabled(String file) {
+        InvalidXMLSyntaxException exception = Assertions.assertThrows(InvalidXMLSyntaxException.class, () ->
+                SvgSecurityValidator.builder()
+                        .withSyntaxValidation()
+                        .build()
+                        .validate(loadFile(file)));
+        assertTrue(exception.getMessage().contains("lineNumber:"));
+        assertTrue(exception.getMessage().contains("columnNumber:"));
     }
 
     @Test
@@ -120,6 +133,7 @@ class SvgSecurityValidatorTest {
 
     private static Stream<Arguments> brokenUseCases() {
         return Stream.of(
+                Arguments.of("broken/broken.syntax.svg"),
                 Arguments.of("broken/broken.csv.svg"),
                 Arguments.of("broken/broken.png.svg")
         );
