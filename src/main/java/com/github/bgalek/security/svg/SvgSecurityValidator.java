@@ -1,12 +1,11 @@
 package com.github.bgalek.security.svg;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import org.owasp.html.CssSchema;
 import org.owasp.html.HtmlChangeListener;
 import org.owasp.html.HtmlPolicyBuilder;
 import org.owasp.html.PolicyFactory;
 
+import javax.xml.parsers.DocumentBuilder;
+import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
@@ -29,6 +28,7 @@ public class SvgSecurityValidator implements XssDetector {
 
     private final String[] svgElements;
     private final String[] svgAttributes;
+    private final DocumentBuilder xmlParser;
 
     /**
      * Use builder SvgSecurityValidator.builder()
@@ -37,11 +37,13 @@ public class SvgSecurityValidator implements XssDetector {
     public SvgSecurityValidator() {
         this.svgElements = SvgElements.DEFAULT_SVG_ELEMENTS;
         this.svgAttributes = SvgAttributes.DEFAULT_SVG_ATTRIBUTES;
+        this.xmlParser = null;
     }
 
-    SvgSecurityValidator(String[] elements, String[] attributes) {
+    SvgSecurityValidator(String[] elements, String[] attributes, DocumentBuilder xmlParser) {
         this.svgElements = elements;
         this.svgAttributes = attributes;
+        this.xmlParser = xmlParser;
     }
 
     public static SvgSecurityValidatorBuilder builder() {
@@ -57,6 +59,7 @@ public class SvgSecurityValidator implements XssDetector {
      */
     @Override
     public ValidationResult validate(String input) {
+        if (xmlParser != null) validateXMLSchema(input);
         Set<String> offendingElements = getOffendingElements(input);
         if (offendingElements.isEmpty()) return new NegativeValidationResult();
         return new PositiveValidationResult(offendingElements);
@@ -65,6 +68,15 @@ public class SvgSecurityValidator implements XssDetector {
     @Override
     public ValidationResult validate(byte[] input) {
         return validate(new String(input, StandardCharsets.UTF_8));
+    }
+
+    private void validateXMLSchema(String input) {
+        try {
+            assert xmlParser != null;
+            xmlParser.parse(new ByteArrayInputStream(input.getBytes()));
+        } catch (Exception e) {
+            throw new InvalidXMLSyntaxException(e);
+        }
     }
 
     private Set<String> getOffendingElements(String xml) {
