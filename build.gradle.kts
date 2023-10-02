@@ -3,7 +3,7 @@ plugins {
     `maven-publish`
     signing
     jacoco
-    id("org.sonarqube") version "4.3.0.3225"
+    id("org.sonarqube") version "4.4.0.3356"
     id("pl.allegro.tech.build.axion-release") version "1.15.5"
     id("com.adarshr.test-logger") version "3.2.0"
     id("io.github.gradle-nexus.publish-plugin") version "1.3.0"
