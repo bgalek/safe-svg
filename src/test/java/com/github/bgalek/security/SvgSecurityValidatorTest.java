@@ -126,6 +126,7 @@ class SvgSecurityValidatorTest {
                 Arguments.of("hacked/with-onclick-attribute.svg", "onclick"),
                 Arguments.of("hacked/with-script-tag.svg", "script"),
                 Arguments.of("hacked/with-script-tag-in-styles.svg", "script"),
+                Arguments.of("hacked/with-invalid-script-tag-in-styles.svg", "script"),
                 Arguments.of("hacked/with-css-url-syntax.svg", "style"),
                 Arguments.of("hacked/with-xlink-injection.svg", "script")
         );
