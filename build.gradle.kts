@@ -25,7 +25,9 @@ java {
     withSourcesJar()
     withJavadocJar()
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(8))
+        languageVersion.set(JavaLanguageVersion.of(21))
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 }
 
@@ -44,17 +46,9 @@ tasks.withType<Test> {
     }
 }
 
-jacoco {
-    toolVersion = "0.8.6"
-    reportsDir = file("$buildDir/reports/jacoco")
-}
-
 tasks.jacocoTestReport {
     reports {
-        xml.isEnabled = true
-        xml.destination = file("$buildDir/reports/jacoco/report.xml")
-        csv.isEnabled = false
-        html.isEnabled = false
+        xml.required = true
     }
 }
 
