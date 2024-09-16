@@ -12,7 +12,7 @@ public interface ValidationResult {
     boolean hasViolations();
 
     /**
-     * @return list of invalid elements or attributes found in SVG content
+     * @return set of invalid elements or attributes found in SVG content
      */
     Set<String> getOffendingElements();
 }
