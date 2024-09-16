@@ -7,11 +7,7 @@ import org.owasp.html.PolicyFactory;
 import javax.xml.parsers.DocumentBuilder;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -25,6 +21,7 @@ import java.util.regex.Pattern;
 public class SvgSecurityValidator implements XssDetector {
 
     private static final Pattern JAVASCRIPT_PROTOCOL_IN_CSS_URL = Pattern.compile("url\\(.?javascript");
+    private static final Pattern SCRIPT_TAG = Pattern.compile("</?\\s*(?)script\\s*[a-zA-Z=/\"]*\\s*>", Pattern.CASE_INSENSITIVE);
 
     private final String[] svgElements;
     private final String[] svgAttributes;
@@ -81,6 +78,7 @@ public class SvgSecurityValidator implements XssDetector {
 
     private Set<String> getOffendingElements(String xml) {
         if (JAVASCRIPT_PROTOCOL_IN_CSS_URL.matcher(xml).find()) return Collections.singleton("style");
+        if (SCRIPT_TAG.matcher(xml).find()) return Collections.singleton("script");
         PolicyFactory policy = new HtmlPolicyBuilder()
                 .allowElements(this.svgElements)
                 .allowAttributes(this.svgAttributes).globally()
