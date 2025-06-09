@@ -15,7 +15,7 @@ repositories {
 
 dependencies {
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20220608.1")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.11.4")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.13.1")
 }
 
 group = "com.github.bgalek.security.svg"
