@@ -19,6 +19,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v5
       - run: ./gradlew build
       - run: ./gradlew jacocoTestReport
+      - run: ./gradlew release -Prelease.forceVersion=testing-0.0.1
       - uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
