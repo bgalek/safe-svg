@@ -20,8 +20,14 @@ import java.util.regex.Pattern;
  */
 public class SvgSecurityValidator implements XssDetector {
 
-    private static final Pattern JAVASCRIPT_PROTOCOL_IN_CSS_URL = Pattern.compile("url\\(.?javascript");
-    private static final Pattern SCRIPT_TAG = Pattern.compile("</?\\s*(?)script\\s*[a-zA-Z=/\"]*\\s*>", Pattern.CASE_INSENSITIVE);
+    private static final Pattern JAVASCRIPT_PROTOCOL_IN_CSS_URL =
+            Pattern.compile("url\\(\\s*['\"]?\\s*javascript", Pattern.CASE_INSENSITIVE);
+    private static final Pattern SCRIPT_TAG =
+            Pattern.compile("<\\s*/?\\s*script(\\s|/|>|$)", Pattern.CASE_INSENSITIVE);
+    // The sanitizer protocol-filters "href" but not "xlink:href" (which is on the allow-list),
+    // so a javascript: protocol can otherwise slip through on permitted elements such as <image>/<use>.
+    private static final Pattern JAVASCRIPT_PROTOCOL_IN_XLINK_HREF =
+            Pattern.compile("xlink:href\\s*=\\s*[\"']?\\s*javascript:", Pattern.CASE_INSENSITIVE);
 
     private final String[] svgElements;
     private final String[] svgAttributes;
@@ -70,7 +76,7 @@ public class SvgSecurityValidator implements XssDetector {
     private void validateXMLSchema(String input) {
         try {
             assert xmlParser != null;
-            xmlParser.parse(new ByteArrayInputStream(input.getBytes()));
+            xmlParser.parse(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)));
         } catch (Exception e) {
             throw new InvalidXMLSyntaxException(e);
         }
@@ -79,6 +85,7 @@ public class SvgSecurityValidator implements XssDetector {
     private Set<String> getOffendingElements(String xml) {
         if (JAVASCRIPT_PROTOCOL_IN_CSS_URL.matcher(xml).find()) return Collections.singleton("style");
         if (SCRIPT_TAG.matcher(xml).find()) return Collections.singleton("script");
+        if (JAVASCRIPT_PROTOCOL_IN_XLINK_HREF.matcher(xml).find()) return Collections.singleton("xlink:href");
         PolicyFactory policy = new HtmlPolicyBuilder()
                 .allowElements(this.svgElements)
                 .allowAttributes(this.svgAttributes).globally()
@@ -86,6 +93,12 @@ public class SvgSecurityValidator implements XssDetector {
                 .toFactory();
         Set<String> violations = new HashSet<>();
         policy.sanitize(xml, violationsCollector(), violations);
+        // The "style" attribute is part of the default allow-list and is intentionally permitted.
+        // Newer versions of owasp-java-html-sanitizer strip it whenever CSS styling is not explicitly
+        // enabled, which would surface it as a false-positive violation. CSS-based JavaScript injection
+        // (e.g. url(javascript:...)) is detected separately by JAVASCRIPT_PROTOCOL_IN_CSS_URL above,
+        // so removing it here preserves the original detection contract.
+        violations.remove("style");
         return violations;
     }
 

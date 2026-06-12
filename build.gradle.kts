@@ -14,8 +14,10 @@ repositories {
 }
 
 dependencies {
-    implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20220608.1")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.11.4")
+    implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20260313.1")
+    testImplementation(platform("org.junit:junit-bom:6.1.0"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 group = "com.github.bgalek.security.svg"
@@ -26,9 +28,11 @@ java {
     withJavadocJar()
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(21))
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
     }
+}
+
+tasks.named<JavaCompile>("compileJava") {
+    options.release.set(8)
 }
 
 tasks {
@@ -104,6 +108,8 @@ nexusPublishing {
         sonatype {
             username.set(System.getenv("SONATYPE_USERNAME"))
             password.set(System.getenv("SONATYPE_PASSWORD"))
+            nexusUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://central.sonatype.com/repository/maven-snapshots/"))
         }
     }
 }

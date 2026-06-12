@@ -1,5 +1,6 @@
 package com.github.bgalek.security.svg;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -32,8 +33,15 @@ public class SvgSecurityValidatorBuilder {
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         try {
             documentBuilderFactory.setNamespaceAware(true);
-            documentBuilderFactory.setFeature("http://xml.org/sax/features/namespaces", false);
+            // Harden against XXE and entity-expansion (billion laughs) attacks. A DOCTYPE declaration
+            // is still allowed because many legitimate SVGs ship one, but external entities and DTDs
+            // are never resolved.
+            documentBuilderFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
             documentBuilderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+            documentBuilderFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            documentBuilderFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            documentBuilderFactory.setXIncludeAware(false);
+            documentBuilderFactory.setExpandEntityReferences(false);
             this.xmlParser = documentBuilderFactory.newDocumentBuilder();
         } catch (ParserConfigurationException e) {
             throw new RuntimeException(e);

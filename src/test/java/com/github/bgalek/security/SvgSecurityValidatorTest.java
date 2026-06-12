@@ -68,6 +68,20 @@ class SvgSecurityValidatorTest {
         assertTrue(exception.getMessage().contains("columnNumber:"));
     }
 
+    @MethodSource("xxeUseCases")
+    @ParameterizedTest(name = "neutralize {0}")
+    void shouldNeutralizeMaliciousEntitiesWhenSyntaxValidationIsEnabled(String file) {
+        // The hardened parser must neither resolve external entities (XXE / SSRF / file disclosure)
+        // nor expand nested entities (billion-laughs DoS). It should complete without throwing,
+        // without hanging, and report no violations.
+        ValidationResult detect = SvgSecurityValidator.builder()
+                .withSyntaxValidation()
+                .build()
+                .validate(loadFile(file));
+        assertFalse(detect.hasViolations());
+        assertEquals(Collections.emptySet(), detect.getOffendingElements());
+    }
+
     @Test
     void shouldNotFailWhenUserDefinedAttributesAreUsed() {
         String testFile = loadFile("custom/custom1.svg");
@@ -128,7 +142,23 @@ class SvgSecurityValidatorTest {
                 Arguments.of("hacked/with-script-tag-in-styles.svg", "script"),
                 Arguments.of("hacked/with-invalid-script-tag-in-styles.svg", "script"),
                 Arguments.of("hacked/with-css-url-syntax.svg", "style"),
+                Arguments.of("hacked/with-uppercase-css-url-syntax.svg", "style"),
+                Arguments.of("hacked/with-single-quoted-script-tag-in-styles.svg", "script"),
+                Arguments.of("hacked/with-uppercase-script-tag.svg", "script"),
+                Arguments.of("hacked/with-spaced-script-tag.svg", "script"),
+                Arguments.of("hacked/with-onload-attribute.svg", "onload"),
+                Arguments.of("hacked/with-onerror-attribute.svg", "onerror"),
+                Arguments.of("hacked/with-data-uri-in-href.svg", "href"),
+                Arguments.of("hacked/with-xlink-href-javascript-on-image.svg", "xlink:href"),
+                Arguments.of("hacked/with-xlink-href-javascript-on-use.svg", "xlink:href"),
                 Arguments.of("hacked/with-xlink-injection.svg", "script")
+        );
+    }
+
+    private static Stream<Arguments> xxeUseCases() {
+        return Stream.of(
+                Arguments.of("xxe/with-external-entity.svg"),
+                Arguments.of("xxe/billion-laughs.svg")
         );
     }
 

@@ -23,7 +23,7 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
       - if: github.ref_name == github.event.repository.default_branch
-        run: ./gradlew sonarqube -Dsonar.login=${SONAR_TOKEN} -Dsonar.projectKey=bgalek_safe-svg -Dsonar.organization=bgalek-github -Dsonar.host.url=https://sonarcloud.io
+        run: ./gradlew sonar -Dsonar.token=${SONAR_TOKEN} -Dsonar.projectKey=bgalek_safe-svg -Dsonar.organization=bgalek-github -Dsonar.host.url=https://sonarcloud.io
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

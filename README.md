@@ -7,7 +7,6 @@
 ![GitHub Release Date](https://img.shields.io/github/release-date/bgalek/safe-svg.svg?style=flat-square)
 ![Maven Central](https://img.shields.io/maven-central/v/com.github.bgalek.security.svg/safe-svg?style=flat-square)
 ![Libraries.io dependency status for GitHub repo](https://img.shields.io/librariesio/github/bgalek/safe-svg.svg?style=flat-square)
-![Scrutinizer code quality](https://img.shields.io/scrutinizer/g/bgalek/safe-svg.svg?style=flat-square)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=bgalek_safe-svg&metric=alert_status)](https://sonarcloud.io/dashboard?id=bgalek_safe-svg?style=flat-square)
 
 It will help you in detecting malicious content inside uploaded SVGs.
@@ -36,7 +35,7 @@ alert('Hello, world!');
 Add library dependency:
 
 ```groovy
-compile "com.github.bgalek.security.svg:safe-svg:1.1.4"
+implementation "com.github.bgalek.security.svg:safe-svg:1.2.0"
 ```
 
 You can use this library to check uploaded svg files
@@ -66,3 +65,16 @@ ValidationResult detect = SvgSecurityValidator.builder()
     .build()
     .validate(testFile);
 ```
+
+You can also enable strict XML syntax validation. The input is parsed with an XXE-hardened
+parser (external entities and DTDs are never resolved, entity expansion is disabled), and an
+`InvalidXMLSyntaxException` is thrown for malformed XML:
+
+```java
+ValidationResult detect = SvgSecurityValidator.builder()
+    .withSyntaxValidation()
+    .build()
+    .validate(testFile);
+```
+
+Both `String` and `byte[]` inputs are supported (`byte[]` is decoded as UTF-8).
